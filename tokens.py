@@ -1,19 +1,31 @@
 import ply.lex as lex
 
-tokens = ('COMMAND', "LCBRACKET", "RCBRACKET", "PROPS", "TEXT")
+COMMAND_TOKENS = {
+    'begin': 'BEGIN',
+    'itemize': 'ITEMIZE',
+    'item': 'ITEM',
+    'end': 'END',
+    'textit': "TEXTIT"
+}
+tokens = ('COMMAND', "LCBRACKET", "RCBRACKET", "PROPS", "TEXT") + tuple(COMMAND_TOKENS.values())
+
 
 #################################
 ############ TOKENS #############
 # Tokeny mozna definiowac jako zmienna i jako metoda
 
+
 t_LCBRACKET = r'\{'
 t_RCBRACKET = r'\}'
-t_PROPS = r'\{(\w+)\}'
+t_PROPS = r'\{([\w\s\|]+)\}'
 
 
 def t_COMMAND(token):
     r'\\(\w+)\s*'
-    token.value = str (token.value).strip()
+    stripped = str(token.value).strip()
+    token.value = stripped[1:]
+    if token.value in COMMAND_TOKENS:
+        token.type = COMMAND_TOKENS.get(token.value)
     return token
 
 
@@ -50,18 +62,21 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
+
 lexer = lex.lex()
 
-input = """
-\\begin{enumerate}
+input = f"""
+\\begin{{itemize}}
     \\item sample text
+    \\item another text
+\\end{{itemize}}
+\\textit{{text to italic}}
 """
 
+print(input)
 lexer.input(input)
 
 nextToken = lexer.token()
 while nextToken is not None:
     print(nextToken)
     nextToken = lexer.token()
-
-
