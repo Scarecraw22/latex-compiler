@@ -1,5 +1,5 @@
 import ply.lex as lex
-from tokens import tokens
+from latex_lexer import tokens
 
 lexer = lex.lex()
 
