@@ -2,32 +2,94 @@ import ply.lex as lex
 
 
 class LatexLexer(object):
-    tokens = ("BEGIN_DOC", "END_DOC", "TITLE", "COMMENT",
-              "SECTION", "SUBSECTION", "BEGIN_UNORDERED_LIST", "END_UNORDERED_LIST",
-              "BEGIN_ORDERED_LIST", "END_ORDERED_LIST", "LIST_ITEM", "ITALIC", "TEXT")
+    tokens = (
+        'AUTHOR',
+        'BEGIN_DOCUMENT',
+        'BEGIN_OLIST',
+        'BEGIN_ULIST',
+        'BEGIN_TABULAR',
+        'BOLD',
+        'CENTERLINE',
+        'CHAPTER',
+        'COLUMN_DIVIDER',
+        'COLUMN_PATTERN_BORDERLESS',
+        'COLUMN_PATTERN_BORDERED',
+        'DOCUMENTCLASS',
+        'END_DOCUMENT',
+        'END_OLIST',
+        'END_ULIST',
+        'END_TABULAR',
+        'GRAPHICS_PATH',
+        'HLINE',
+        'INCLUDE_GRAPHICS',
+        'ITALIC',
+        'ITEM',
+        'LBRACE',
+        'NEW_LINE',
+        'NULL',
+        'PARAGRAPH',
+        'RBRACE',
+        'ROW_END',
+        'SECTION',
+        'SUBSECTION',
+        'SUBSUBSECTION',
+        'TEXT',
+        'TITLE',
+        'UNDERLINE',
+        'URL',
+        'USE_PACKAGE',
+    )
 
-    t_BEGIN_DOC = r'\\begin\{document}'
-    t_END_DOC = r'\\end\{document}'
-    t_TITLE = r'\\title\{[\w\s\d]*}'
-    t_SECTION = r'\\section{[\w\s\d]*}'
-    t_SUBSECTION = r'\\subsection{[\w\s\d]*}'
-    t_BEGIN_UNORDERED_LIST = r'\\begin{itemize}'
-    t_END_UNORDERED_LIST = r'\\end{itemize}'
-    t_BEGIN_ORDERED_LIST = r'\\begin{enumerate}'
-    t_END_ORDERED_LIST = r'\\end{enumerate}'
-    t_LIST_ITEM = r'\\item'
-    t_ITALIC = r'\\textit{[\w\s\d]*}'
-    t_TEXT = r'[A-Za-z,;:\'"\s\d]+'
+    t_AUTHOR = r'\\author'
+    t_BEGIN_DOCUMENT = r'\\begin\{document\}'
+    t_BEGIN_OLIST = r'\\begin\{enumerate\}'
+    t_BEGIN_ULIST = r'\\begin\{itemize\}'
+    t_BEGIN_TABULAR = r'\\begin\{tabular\}'
+    t_BOLD = r'\\textbf'
+    t_CENTERLINE = r'\\centerline'
+    t_CHAPTER = r'\\chapter'
+    t_COLUMN_DIVIDER = r'&'
+    t_COLUMN_PATTERN_BORDERLESS = r'\{[lcr](\s[lcr])*\}'
+    t_COLUMN_PATTERN_BORDERED = r'\{(\|\s[lcr]\s)+\|\}'
+    t_DOCUMENTCLASS = r'\\documentclass.*'
+    t_END_DOCUMENT = r'\\end\{document\}'
+    t_END_OLIST = r'\\end\{enumerate\}'
+    t_END_ULIST = r'\\end\{itemize\}'
+    t_END_TABULAR = r'\\end\{tabular\}'
+    t_GRAPHICS_PATH = r'\\graphicspath'
+    t_INCLUDE_GRAPHICS = r'\\includegraphics'
+    t_ITALIC = r'\\textit'
+    t_ITEM = r'\\item'
+    t_LBRACE = r'\{'
+    t_NEW_LINE = r'\\newline'
+    t_NULL = r'\0'
+    t_PARAGRAPH = r'\\paragraph'
+    t_RBRACE = r'\}'
+    t_ROW_END = r'\\\\'
+    t_SECTION = r'\\section'
+    t_SUBSECTION = r'\\subsection'
+    t_SUBSUBSECTION = r'\\subsubsection'
+    t_TEXT = r'[\w\d\.,!?@#/\'\"<>\(\)\-+=\/^\*:;|\[\]]+'
+    t_TITLE = r'\\title'
+    t_UNDERLINE = r'\\underline'
+    t_URL = r'\\url'
+    t_USE_PACKAGE = r'\\usepackage.*'
 
     # New line rule
     def t_newline(self, t):
         r'\n+'
-        t.lexer.lineno += len(t.value)
+        t.lexer.lineno += t.value.count("\n")
 
     # Comment rule
-    def t_COMMENT(self, t):
-        r'%.*'
+    def t_comment(self, t):
+        r'%.*\n'
         pass
+
+    def t_hline(self, t):
+        r'\\hline'
+        pass
+
+    t_ignore = ' '
 
     # Column finding rule
     def find_column(self, input, token):
@@ -38,6 +100,9 @@ class LatexLexer(object):
     def t_error(self, t):
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)
+
+    def __init__(self):
+        self.lexer = lex.lex(module=self)
 
     # Build the lexer
     def build(self, **kwargs):
@@ -50,5 +115,3 @@ class LatexLexer(object):
         while next_token is not None:
             print(next_token)
             next_token = self.lexer.token()
-
-
