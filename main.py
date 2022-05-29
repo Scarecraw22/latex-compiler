@@ -4,6 +4,7 @@ import getopt
 from latex_lexer import LatexLexer
 from latex_parser import LatexParser
 
+
 def print_tokens(input_file_absolute_path):
     lexer = LatexLexer().lexer
     input_file = open(input_file_absolute_path, "r")
@@ -27,8 +28,8 @@ def parse_input(input_file_absolute_path, output_file_absolute_path):
 
 def compile(input_file_name, output_file_name):
     current_folder_path = os.path.dirname(__file__)
-    input_file_name = input_file_name + ".tex"
-    output_file_name = output_file_name+".html"
+    input_file_name = input_file_name
+    output_file_name = output_file_name
 
     input_file_absolute_path = os.path.join(current_folder_path, input_file_name)
     output_file_absolute_path = os.path.join(current_folder_path, output_file_name)
